@@ -1684,7 +1684,6 @@ Clustering::trueD(Stru* a, Stru* b)
     //memcpy(coord2, coor2, mLen*3*sizeof(float));
     rmsd = (float) rmsfit_(&mLen, coord1, coord2);
 #endif
-//cout << rmsd << endl;
     return rmsd;
 }
 
@@ -1828,7 +1827,6 @@ Clustering::getRandomDecoyNames(vector<char *>* srcnames, int size, int seed)
         randomArray[i] = i;
 
     // swap the first size elements with other elements from the whole array
-    /*
     for (int i = 0; i < size; i++)
     {
         // find an index j (i<j<totalsize) to swap with the element i
@@ -1837,12 +1835,10 @@ Clustering::getRandomDecoyNames(vector<char *>* srcnames, int size, int seed)
         randomArray[j] = randomArray[i];
         randomArray[i] = t;
     }
-    */
     // copy the first randomDecoysSize elements into a smaller array
     vector<char *> * names = new vector<char *>(0);
     for (int i = 0; i < size; i++)
     {
-//cout << i << ": " << (*srcnames)[randomArray[i]] << endl;
         names->push_back((*srcnames)[randomArray[i]]);
     }
     delete [] randomArray;
@@ -2136,7 +2132,6 @@ Clustering::estimateDist(vector<Stru *> * decoys, float xPercent,
         for (int j=i+1; j < numdecoys; j++)
         {
             b = (*decoys)[j];
-//cout << i << "," << j << endl;
             r = trueD(a, b);
             alldists[k] = r;
             k++;
