@@ -1,0 +1,28 @@
+HISTORY:
+
+2021-11-29
+    Fixed precision problem with RMSD calculations.
+
+2021-11-27
+    Code fixes to pass less forgiving compilers.
+
+2013-05-08
+    Rewrote codes for computing RMSD.
+
+2012-08-20
+    1. Support for silent file input.
+    2. Decoy files are loaded into memory by default; disk bound access is
+reverted to when the number of files exceeds PreloadedPDB::ADVISED_THRESHOLD,
+or when user specifies it ("-d").
+
+2012-01-17
+    Added two improvements to the program due to Jared Adolf-Bryfogle (Drexel
+College of Medicine). It is now possible to specify the chains to use for
+clustering. (Previously, Calibur uses only the chains 'A', 'C', and ' ' in
+constructing the structures for clustering.) Similarly, the restriction can be
+specified as a range of C-alpha atoms, e.g. from the 51th to the 109th C-alpha
+atom. Please run "calibur" without any commandline argument for the details.
+
+2009-08-13
+    Initial public release.
+
