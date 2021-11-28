@@ -1835,6 +1835,7 @@ Clustering::getRandomDecoyNames(vector<char *>* srcnames, int size, int seed)
         randomArray[j] = randomArray[i];
         randomArray[i] = t;
     }
+
     // copy the first randomDecoysSize elements into a smaller array
     vector<char *> * names = new vector<char *>(0);
     for (int i = 0; i < size; i++)
