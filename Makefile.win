@@ -1,0 +1,12 @@
+obj_files=main.obj InitCluster.obj cubic.obj jacobi.obj PreloadedPDB.obj SimpPDB.obj rmsd.obj
+
+all: calibur.exe
+
+.cc.obj:
+	cl.exe /nologo /c /D__WIN32__ /D_USE_FAST_RMSD_ /D_LARGE_DECOY_SET_ /O2 $<
+
+calibur.exe: $(obj_files)
+	link.exe -out:calibur.exe $(obj_files)
+
+clean:
+	del *.obj

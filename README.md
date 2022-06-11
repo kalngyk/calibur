@@ -4,14 +4,16 @@ This is the source codes for the Calibur program reported in https://bmcbioinfor
 
 How to compile:
 
-   We assume that you are running a variant of UNIX, or Cygwin. Your system
-   should have the GNU C compiler (`gcc`) and Make (`make`) installed.
-
+   If you are running a variant of UNIX (or MacOS/WSL/Cygwin/MSYS2), you should have the GNU C compiler (`gcc`) and Make (`make`) installed.
    At the directory where the file Makefile is, type `make`.
    This will build two programs: calibur and calibur-lite
    
    - calibur is the main program.
    - calibur-lite is a lighter version of calibur which reports only the best decoy.
+
+   If you are running MS Windows, you should have installed MS Visual Studio Community.
+   Open the Developer Command Prompt, and type `nmake /F Makefile.win`
+   This will build the program calibur.exe.
 
    That's all!
 

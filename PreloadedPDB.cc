@@ -23,6 +23,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <sstream>
 
 #include <string.h>
 #include <stdlib.h>
@@ -75,6 +76,9 @@ filetype(char * filename)
     }
     char *name = new char[strlen(token)+1];
     strcpy(name, token);
+
+    if ((int)name[strlen(name)-1]==13)
+        cout << "WARNING: decoy list in DOS format detected" << endl;
 
     ifstream pdbfile(name); // check if name is a file
     if (pdbfile)

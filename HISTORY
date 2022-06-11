@@ -1,5 +1,8 @@
 HISTORY:
 
+2022-06-11
+    Windows version now compiles on Visual Studio instead of Code::Blocks
+
 2022-06-10
     Added option ("-a") to specify names of atoms to use.
 

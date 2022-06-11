@@ -530,7 +530,7 @@ Clustering::getThresholdAndDecoys()
     {
         THRESHOLD = xPercentileDist;
         cout << "Finding threshold to keep " << xPercentile
-             << "\% edges" << endl;
+             << "%% edges" << endl;
         cout << "Threshold = " << THRESHOLD << endl;
     }
 
@@ -743,10 +743,10 @@ Clustering::estimateDist(vector<char *>* allNames,
     fflush(stdout);
 #endif
 
-    float maxDists[numTrials-1];
-    float minDists[numTrials-1];
-    float mostFreqDists[numTrials-1];
-    float xPercentileDists[numTrials-1];
+    float *maxDists = new float[numTrials-1];
+    float *minDists = new float[numTrials-1];
+    float *mostFreqDists = new float[numTrials-1];
+    float *xPercentileDists = new float[numTrials-1];
     for (int i=0; i < numTrials-1; i++)
     {
         randNames = getRandomDecoyNames(allNames, randDecoySize, 1 + i*100);
