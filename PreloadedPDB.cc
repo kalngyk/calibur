@@ -325,9 +325,16 @@ PreloadedPDB::loadPDBFromList(char * filename)
     pdb->mProteinFileName = (*mNames)[0];
     pdb->mNumResidue = LONGEST_CHAIN;
     pdb->mCAlpha = new float[3*LONGEST_CHAIN];
-    pdb->read();
+    int count = pdb->read();
+    if (count <= 0)
+    {
+        cout << "Error: no residue in decoy file \"" << (*mNames)[0] << "\""
+             << endl;
+        exit(0);
+    }
 
     mNumResidue = pdb->mNumResidue;
+    cout << "Specifications result in " << mNumResidue << " atoms" << endl;
 
     filename2PDB[(*mNames)[0]] = pdb;
 
@@ -335,7 +342,15 @@ PreloadedPDB::loadPDBFromList(char * filename)
     {
         SimPDB * pdb = new SimPDB(mNumResidue);
         pdb->mProteinFileName = (*mNames)[i];
-        pdb->read();
+        int count = pdb->read();
+        if (count != mNumResidue)
+        {
+            cout << "Error: \"" << (*mNames)[i] << "\" "
+                 << "has mismatching number of residues"
+                 << " (should have " << mNumResidue << " but has only "
+                 << count << ")" << endl;
+            exit(0);
+        }
         filename2PDB[(*mNames)[i]] = pdb;
     }
 }

@@ -324,6 +324,10 @@ Clustering::initialize(char * filename, float threshold)
 
     cout << "Filtering " << (FILTER_MODE? "on": "off") << endl;
     cout << "Signature mode " << (_use_sig_? "on": "off") << endl;
+    cout << "Using atoms ";
+    for (int i=0; i < SimPDB::atom_names.size(); i++)
+        cout << "\"" << SimPDB::atom_names[i] << "\"" << (i==SimPDB::atom_names.size()-1? "": ", ");
+    cout << " in PDB files" << endl;
     cout << "Using chains ";
     for (char * c = SimPDB::chains; *c; c++)
         cout << "'" << *c << "'" << (*(c+1)=='\0'? "": ", ");
@@ -1591,10 +1595,8 @@ Clustering::trueD(int i, int j)
     rmsd = fast_rmsd(coord1, coord2, mLen);
     if (rmsd != rmsd) // crazy RMSD
         rmsd = RMSD(coord1, coord2, mLen);
-#else
-    //memcpy(coord1, coor1, mLen*3*sizeof(float));
-    //memcpy(coord2, coor2, mLen*3*sizeof(float));
-    rmsd = (float) rmsfit_(&mLen, coord1, coord2);
+#else // don't bother with fast_rmsd
+    rmsd = RMSD(coord1, coord2, mLen);
 #endif
     return (float) rmsd;
 }
@@ -1835,7 +1837,6 @@ Clustering::getRandomDecoyNames(vector<char *>* srcnames, int size, int seed)
         randomArray[j] = randomArray[i];
         randomArray[i] = t;
     }
-
     // copy the first randomDecoysSize elements into a smaller array
     vector<char *> * names = new vector<char *>(0);
     for (int i = 0; i < size; i++)

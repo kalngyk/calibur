@@ -41,6 +41,9 @@ using namespace std;
 int SimPDB::s_residue = 1;
 int SimPDB::e_residue = LONGEST_CHAIN;
 char * SimPDB::chains = strdup("AC ");
+vector<string> SimPDB::atom_names = {"CA"};
+vector<string> SimPDB::atom_matchstrs = {" CA ", "CA  ", "  CA", "CA"};
+
 
 // Set these two fields to tell SimPDB to use the PreloadedPDB mechanism
 PreloadedPDB * SimPDB::preloadedPDB = NULL;
@@ -113,6 +116,51 @@ void center_residues(float * mCAlpha, int mNumResidue)
 }
 
 //- = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = -
+
+int
+SimPDB::init_atom_names(string namelist, char delimiter)
+{
+    istringstream is(namelist);
+    string name;
+    atom_names.clear();
+    atom_matchstrs.clear();
+    while (getline(is, name, delimiter))
+    {
+        atom_names.push_back(name);
+        switch (name.length())
+        {
+            case 1:
+            {
+                string a[4] = {"   " + name, name + "   ",
+                               "  " + name + " ", " " + name + "  "};
+                atom_matchstrs.insert(atom_matchstrs.end(), a, a+4);
+                break;
+            }
+            case 2:
+            {
+                string a[3] = {"  " + name, name + "  ", " " + name + " "};
+                atom_matchstrs.insert(atom_matchstrs.end(), a, a+3);
+                break;
+            }
+            case 3:
+            {
+                string a[2] = {" " + name, name + " "};
+                atom_matchstrs.insert(atom_matchstrs.end(), a, a+2);
+                break;
+            }
+            default: // 0 or >3
+            {
+                cout << "Invalid atom name specification \"" << name << "\": "
+                     << "atom name must be 1~3 characters long"
+                     << endl << endl;
+                return -1;
+            }
+        }
+    }
+    return 0;
+}
+
+//- = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = -
 // General purpose constructors which handle the preloadedPDB mechanism
 
 SimPDB::SimPDB(char *aFileName)
@@ -157,7 +205,15 @@ SimPDB::SimPDB(char *aFileName, int len)
         mProteinFileName = aFileName;
         mNumResidue = len;
         mCAlpha = new float[3*len];
-        read();
+        int count = read();
+        if (count != mNumResidue)
+        {
+            cout << "Error: \"" << aFileName
+                 << "\" has mismatching number of residues"
+                 << " (should have " << mNumResidue
+                 << " but has only " << count << ")" << endl;
+            exit(0);
+        }
     }
 }
 
@@ -190,10 +246,20 @@ SimPDB::SimPDB(int len)
 
 //- = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = -
 
+static bool
+_matches_atom_names(string line)
+{
+    for (int i=0; i < SimPDB::atom_matchstrs.size(); i++)
+        if (line.substr(13, SimPDB::atom_matchstrs[i].size()) ==
+               SimPDB::atom_matchstrs[i])
+            return true;
+    return false;
+}
+
 /**
  * Reads a PDB file from disk. Do not read from PDB files anywhere else.
  */
-void
+int
 SimPDB::read()
 {
     ifstream input(mProteinFileName);
@@ -219,27 +285,28 @@ SimPDB::read()
     //float cz = 0;
     int count3 = 0; 
     //mSquaredSum=0;   
-    while (!input.eof())
+    for (int rcount=0; !input.eof(); rcount++)
     {
+        if (rcount > 10000 && count == 0) // this ain't no PDB file bruh
+            break;
         input.getline(buf, 400);
         string line=buf;
         if (line.substr(0, 3) == "TER" && read == true) break;
         if (line.substr(0, 6) == "ENDMDL") break;
-        
-        if (line.substr(0, 4) != "ATOM" && line.substr(0, 6) != "HETATM")
-            continue;			
 
-        if (line.substr(13, 4) == "CA  " || line.substr(13, 4) == " CA "
-            || line.substr(13, 4) == "  CA" || line.substr(13, 2) == "CA")
+        if (line.substr(0, 4) != "ATOM" && line.substr(0, 6) != "HETATM")
+            continue;
+
+        if (_matches_atom_names(line))
         {
-            // At this point a CA atom has been discovered
+            // At this point an atom in PDB::atom_names has been discovered
             // We want to further filter it based on the following two
             // criteria: chain and region.
            
             // Check if the chain which this atom belongs to is to be included
             bool include_chain = false;
             for (char * c = SimPDB::chains; *c; c++)
-                if (toupper(line[21]) == toupper(*c))
+                if (*c == '*' || toupper(line[21]) == toupper(*c))
                 {
                     include_chain = true;
                     break;
@@ -249,7 +316,7 @@ SimPDB::read()
                 CA_number++;
                 continue;
             }
-          
+
             // Check if the CA atom is within the region to analyze
             if (CA_number < SimPDB::s_residue)
             {
@@ -258,12 +325,12 @@ SimPDB::read()
             }
             else if (CA_number > SimPDB::e_residue)
                 break;
-           
+
             read = true;
             int residueID = toInt(line.substr(22, 6));
-            if (residueID == prevID)
+            if (SimPDB::atom_names.size() == 1 && residueID == prevID)
                 continue;
-        
+
             prevID = residueID; 
             x = toFloat(line.substr(30, 8));
             y = toFloat(line.substr(38, 8));
@@ -275,15 +342,16 @@ SimPDB::read()
             mCAlpha[count3+2] = z;
             //mSquaredSum+=x*x+y*y+z*z;
             count++;
-           
+
             CA_number++;
         }
     }//while
 
     mNumResidue = count;
     input.close();
- 
+
     center_residues(mCAlpha, mNumResidue);
+    return count;
 }
 
 /*

@@ -1,5 +1,8 @@
 HISTORY:
 
+2022-06-10
+    Added option ("-a") to specify names of atoms to use.
+
 2021-11-29
     Fixed precision problem with RMSD calculations.
 

@@ -31,7 +31,8 @@ void
 usage(char * progname)
 {
   cerr << "Usage: " << progname
-  << " [-n] [-o] [-r #1,#2] [-c XYZ] [-t s] pdb_list [x]" << endl << endl
+  << " [-n] [-o] [-r #1,#2] [-c XYZ] [-a CCC] [-m] [-t s] pdb_list [x]"
+  << endl << endl
   << "  pdb_list is a text file which specifies the decoys. Each line in"
   << " pdb_list is" << endl
   << "    a path (relative to the working directory) to a decoy's PDB file."
@@ -40,11 +41,27 @@ usage(char * progname)
   << endl << endl
   << "  -o (optional) output all clusters instead of only the top three."
   << endl << endl
-  << "  -r (optional) limits residues to only the #1-th till #2-th C-alpha atoms."
+  << "  -r (optional) limits residues to only the #1-th to #2-th C-alpha atoms"
+  << endl
+  << "                (or the atoms selected using the -a switch)"
   << endl << endl
   << "  -c (optional) specifies that the chains XYZ are to be used."
   << endl
-  << "                By default, XYZ=\"AC \", i.e. 'A', 'C', or unspecified"
+  << "                By default, XYZ=\"AC \", i.e. 'A', 'C', or unspecified."
+  << endl
+  << "                If XYZ=\'*\', all the chains are included."
+  << endl << endl
+  << "  -a (optional) specifies that the atoms of names CCC are to be used."
+  << endl
+  << "                CCC lists atom names as they appear in the PDB file, "
+  << endl
+  << "                e.g. CCC=\"CA,CB\" (comma-delimited)"
+  << endl
+  << "                By default, CCC=\"CA\". i.e. only C-alpha atoms are used."
+  << endl
+  << "                WARNING: When more than one atom names are specified, "
+  << endl
+  << "                multiple atoms from the same residue will be allowed."
   << endl << endl
   << "  -t (optional) specifies the threshold finding strategy." << endl
   << "    s is one of p, f, a, R, r. (default strategy: p)" << endl
@@ -92,8 +109,18 @@ int main(int argc, char** argv)
             break;
         switch (argv[i][1])
         {
-            case 'd': // FIXME feature not revealed in Usage yet
+            case 'd': // this feature is not revealed in usage()
                 SimPDB::preloadPDB = false;
+                break;
+            case 'a':
+                i++;
+                if (i == argc)
+                {
+                    usage(argv[0]);
+                    exit(0);
+                }
+                if (SimPDB::init_atom_names(argv[i], ','))
+                    exit(0);
                 break;
             case 'c':
                 i++;
@@ -122,6 +149,7 @@ int main(int argc, char** argv)
                     SimPDB::e_residue = LONGEST_CHAIN;
                     if (SimPDB::s_residue <= 0) // invalid spec
                     {
+                        cout << "Invalid -r specification" << endl << endl;
                         usage(argv[0]);
                         exit(0);
                     }
@@ -132,6 +160,7 @@ int main(int argc, char** argv)
                     SimPDB::s_residue = 0;
                     if (SimPDB::e_residue <= 0)
                     {
+                        cout << "Invalid -r specification" << endl << endl;
                         usage(argv[0]);
                         exit(0);
                     }
@@ -144,6 +173,7 @@ int main(int argc, char** argv)
                     if (SimPDB::e_residue <= 0 || SimPDB::s_residue <= 0
                         || SimPDB::e_residue < SimPDB::s_residue)
                     {
+                        cout << "Invalid -r specification" << endl << endl;
                         usage(argv[0]);
                         exit(0);
                     }

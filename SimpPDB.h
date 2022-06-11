@@ -50,6 +50,8 @@ class SimPDB
       static int s_residue;
       static int e_residue;
       static char * chains;
+      static vector<string> atom_names;
+      static vector<string> atom_matchstrs;
 
       /**
        * This feature allows the preloading of SimPDB objects.
@@ -63,7 +65,8 @@ class SimPDB
       int mNumResidue;
       //double mSquaredSum;
       float * mCAlpha;
-      void read();
+      int read();
+      static int init_atom_names(string namelist, char delimiter);
 
     public:
       SimPDB(char* aProteinFileName);
