@@ -11,9 +11,9 @@ How to compile:
    - calibur is the main program.
    - calibur-lite is a lighter version of calibur which reports only the best decoy.
 
-   <font color="#556289">If you are running MS Windows, you should have installed MS Visual Studio Community.
+   If you are running MS Windows, you should have installed MS Visual Studio Community.
    Open the Developer Command Prompt at the directory where the file Makefile.win is, type `nmake /F Makefile.win`.
-   This will build the program calibur.exe.</font>
+   This will build the program calibur.exe.
 
    That's all!
 
@@ -34,7 +34,7 @@ decoysdir/1enhA1003.pdb
 
 2. Call calibur with this filename (`mydecoys` say) as the only parameter
 
-   `sh> calibur mydecoys`
+   `sh> calibur mydecoys` (or  `sh> ./calibur mydecoys`, or `C:\> .\calibur mydecoys` according to your system setup)
 
    calibur will figure out a reasonable threshold itself. You can also specify
    a threshold. For example, for threshold 1.0, run calibur as
