@@ -12,7 +12,7 @@ How to compile:
    - calibur-lite is a lighter version of calibur which reports only the best decoy.
 
    If you are running MS Windows, you should have installed MS Visual Studio Community.
-   Open the Developer Command Prompt, and type `nmake /F Makefile.win`
+   Open the Developer Command Prompt at the directory where the file Makefile.win is, type `nmake /F Makefile.win`.
    This will build the program calibur.exe.
 
    That's all!
